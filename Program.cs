@@ -241,6 +241,9 @@ namespace A1
         public void AddZombie(){
             this.battlemap = BATTLEMAP.NewBattleMap(this);
         }
+        public Map getPrivious(){
+            return this.previous;
+        }
         public BATTLEMAP GetBATTLEMAP(){
             return battlemap;
         }
@@ -277,12 +280,13 @@ namespace A1
     class Battle{
         private static string FAILTOESCAPE = "You failed to escape, and been killed by the zombie.";
         public static string LOSTFIGHT = "You have been killed by zombie.";
-        public static string WINFIGHT = "You have killed the zombie! Lets go to your next map!";
+        public static string WINFIGHT = "You have killed the zombie! Lets go to your next map! \n press 1 to go to next map. press 2 to go to previous map.";
         public static string REGAME = "\nRestart the game to play again.";
-        public static string ESCAPED = "You have escaped!";
+        public static string ESCAPED = "You have escaped! \n press 1 to go to next map. press 2 to go to previous map.";
         public static void newBattle (){
                 int order = Convert.ToInt32(Console.ReadLine());
                 bool pass = false;
+                bool escaped = false;
                 if (order == Combate.FIGHT){
                     Program.PLAYER.getLevel().fight(Program.BATTLEMAP.GetZombie().GetLevel());
                     if (Program.PLAYER.getLevel().GetHealth() <= 0){
@@ -301,19 +305,42 @@ namespace A1
                     }
                     else{
                         Console.WriteLine(ESCAPED);
+                        pass = true;
+                        escaped = true;
                     }
                 }
             if (pass == true){
-                Program.CURRENTMAP = Program.CURRENTMAP.NextMap();
+                if (escaped == false){
+                    Console.WriteLine(WINFIGHT);}
                 Program.BATTLEORNO = false;
-                Console.WriteLine(WINFIGHT);
+                bool stat = false;
+                while (stat == false){
+                    int neworder = Convert.ToInt32(Console.ReadLine());
+                    if (neworder == 1){
+                        Program.CURRENTMAP = Program.CURRENTMAP.NextMap();
+                        stat = true;
+                        }
+                    else if (neworder == 2){
+                        if (Program.CURRENTMAP.hasPrevious()){
+                            Program.CURRENTMAP = Program.CURRENTMAP.getPrivious();
+                            stat = true;
+                        }
+                        else{
+                            Console.WriteLine("You have no way behind! Go to next map!");
+                            Console.WriteLine("press 1 to go to next map. press 2 to go to previous map.");
+                        }
+                    }
+                    else{
+                        Console.WriteLine("press 1 to go to next map. press 2 to go to previous map.");
+                    }
+                }
             }
             
         }
     }
     class NormalAction{
         private Player player = Program.PLAYER;
-        public static string RIGHT = "Nothing happen! Is a good sign! You are arrived to the next level.";
+        public static string RIGHT = "Nothing happen! Is a good sign! \n press 1 to go to next map. press 2 to go to previous map.";
         public static string WRONG = "Oh no! A zombie is coming!";
         public static void newNormalAction (){
 
@@ -322,9 +349,27 @@ namespace A1
             string orderstring = Console.ReadLine();
             int order = Convert.ToInt32(orderstring);
             if ( order == rightAnswer){
-
-                Program.CURRENTMAP = Program.CURRENTMAP.NextMap();
                 Console.WriteLine(RIGHT);
+                bool stat = false;
+                while (stat == false){
+                    int neworder = Convert.ToInt32(Console.ReadLine());
+                    if (neworder == 1){
+                        Program.CURRENTMAP = Program.CURRENTMAP.NextMap();
+                        stat = true;
+                        }
+                    else if (neworder == 2){
+                        if (Program.CURRENTMAP.hasPrevious()){
+                            Program.CURRENTMAP = Program.CURRENTMAP.getPrivious();
+                            stat = true;
+                        }
+                        else{
+                            Console.WriteLine("You have no way behind! Go to next map!");
+                        }
+                    }
+                    else{
+                        Console.WriteLine("press 1 to go to next map. press 2 to go to previous map.");
+                    }
+                }
 
             }
             else{
@@ -332,8 +377,6 @@ namespace A1
                 Program.BATTLEORNO = true;
                 Program.CURRENTMAP.AddZombie();
                 Program.BATTLEMAP = Program.CURRENTMAP.GetBATTLEMAP();
-                
-
             }
 
         }
